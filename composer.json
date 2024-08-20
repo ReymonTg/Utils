@@ -1,0 +1,35 @@
+{
+    "name"       : "",
+    "description": "",
+    "keywords"   : [
+    ],
+    "type"   : "library",
+    "license": "GPL-3.0-only",
+    "authors": [
+        {
+            "name" : "Mahdi",
+            "email": "mahdi.talaee1379@gmail.com"
+        },
+        {
+            "name" : "AmirHossein Jafari",
+            "email": "amirhosseinjafari8228@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Namespace\\": "./src"
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+        "amphp/php-cs-fixer-config": "^2.0"
+    },
+    "scripts": {
+        "build": [
+            "@cs-fix"
+        ],
+        "cs"    : "php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v --diff  --dry-run",
+        "cs-fix": "php -d pcre.jit=0 vendor/bin/php-cs-fixer fix -v --diff "
+    }
+}

@@ -1,6 +1,6 @@
 {
-    "name"       : "",
-    "description": "",
+    "name"       : "reymon/utils",
+    "description": "Important resource for Reymon project",
     "keywords"   : [
     ],
     "type"   : "library",
@@ -17,10 +17,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "Namespace\\": "./src"
+            "Reymon\\": "./src"
         }
     },
     "require": {
+        "galbar/jsonpath": "^3"
     },
     "require-dev": {
         "amphp/php-cs-fixer-config": "^2.0"

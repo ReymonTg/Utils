@@ -19,7 +19,7 @@ use ReflectionClass;
 use ReflectionProperty;
 use Reymon\Attributes\JsonMap;
 
-abstract class TypeMapper
+abstract class JsonMapable
 {
     protected function mapProperties(array $json)
     {
@@ -27,7 +27,7 @@ abstract class TypeMapper
         $json = new JsonObject($json);
 
         foreach ($ref->getProperties() as $property) {
-            $name      = $property->getName();
+            $name = $property->getName();
             $attribute = $this->getAttribute($property, JsonMap::class);
 
             if ($attribute) {
@@ -44,7 +44,7 @@ abstract class TypeMapper
      * @internal
      * @param class-string $name
      */
-    protected function getAttribute(ReflectionProperty $property, string $name, int $flags = 0): object
+    protected function getAttribute(ReflectionProperty $property, string $name, int $flags = 0): ?object
     {
         $attribute = $property->getAttributes($name, $flags)[0] ?? null;
         return $attribute?->newInstance();

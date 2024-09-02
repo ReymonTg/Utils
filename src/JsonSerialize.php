@@ -12,22 +12,26 @@
  * @license   https://choosealicense.com/licenses/gpl-3.0/ GPLv3
  */
 
-namespace Reymon\Attributes;
+namespace Reymon;
 
 use Attribute;
 use JsonPath\JsonObject;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class JsonPath
+final class JsonSerialize
 {
-    public function __construct(private string $name, private ?string $json = null)
+    public function __construct(private string $name, private ?string $json = null, private bool $unpack = false)
     {
     }
 
     public function add(JsonObject $jsonObject, mixed $value)
     {
+        if ($value instanceof JsonSerializable && $this->unpack) {
+            $value->mapProperties();
+        }
+
         if (!$this->json) {
-            $this->json = '$.' . $this->name;
+            $this->json = "\$.{$this->name}";
             $jsonObject->set($this->json, $value);
             return;
         }

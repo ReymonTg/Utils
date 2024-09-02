@@ -14,35 +14,36 @@
 
 namespace Reymon;
 
+use Closure;
+use Attribute;
 use JsonPath\JsonObject;
-use JsonSerializable;
-use ReflectionClass;
-use Reymon\Attributes\JsonPath;
 
-abstract class NameMapper extends TypeMapper implements JsonSerializable
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class JsonMap
 {
-    /**
-     * @internal
-     */
-    protected function getJsonExtra(): array
+    private ?Closure $callBack;
+
+    public function __construct(private string $path, private mixed $default = null, Closure|callable|null $callBack = null)
     {
-        return [];
+        if (is_callable($callBack)) {
+            $callBack = Closure::fromCallable($callBack);
+        }
+        $this->callBack = $callBack;
     }
 
-    public function jsonSerialize(): array
+    public function map(JsonObject $json): mixed
     {
-        $ref  = new ReflectionClass($this);
-        $json = new JsonObject();
+        $value = $json->get($this->path);
 
-        foreach ($ref->getProperties() as $property) {
-            $value     = $property->getValue($this);
-            $attribute = $this->getAttribute($property, JsonPath::class);
-
-            if ($attribute && $value !== null) {
-                $attribute->add($json, $value);
+        if (isset($value[0])) {
+            $value = $value[0];
+            if ($this->callBack) {
+                $value = ($this->callBack)($value);
             }
+
+            return $value;
         }
 
-        return \array_merge_recursive($this->getJsonExtra(), $json->getValue());
+        return $this->default;
     }
 }

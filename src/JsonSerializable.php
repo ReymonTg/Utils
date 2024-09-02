@@ -12,21 +12,35 @@
  * @license   https://choosealicense.com/licenses/gpl-3.0/ GPLv3
  */
 
-namespace Reymon\Attributes;
+namespace Reymon;
 
-use Attribute;
+use ReflectionClass;
 use JsonPath\JsonObject;
 
-#[Attribute(Attribute::TARGET_PROPERTY)]
-final class JsonMap
+abstract class JsonSerializable extends JsonMapable implements \JsonSerializable
 {
-    public function __construct(private string $path, private mixed $default = null)
+    final public function serializeProperties(array $extra = []): array
     {
+        $ref  = new ReflectionClass($this);
+        $json = new JsonObject();
+
+        foreach ($ref->getProperties() as $property) {
+            $value     = $property->getValue($this);
+            $attribute = $this->getAttribute($property, JsonSerialize::class);
+
+            if ($attribute && $value !== null) {
+                $attribute->add($json, $value);
+            }
+        }
+
+        return \array_merge_recursive($extra, $json->getValue());
     }
 
-    public function map(JsonObject $json): mixed
+    /**
+     * @internal
+     */
+    public function jsonSerialize(): array
     {
-        $value = $json->get($this->path);
-        return $value[0] ?? $this->default;
+        return $this->serializeProperties();
     }
 }
